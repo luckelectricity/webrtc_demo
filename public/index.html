@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebRTC Demo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>WebRTC Demo</h1>
+  <div class="container">
+    <div class="video-container">
+      <h2>Local Video</h2>
+      <video id="localVideo" autoplay muted></video>
+    </div>
+    <div class="video-container">
+      <h2>Remote Video</h2>
+      <video id="remoteVideo" autoplay></video>
+    </div>
+  </div>
+  <div id="setup-status" style="padding: 10px; color: blue;">Initializing...</div>
+  <div class="controls">
+    <button id="startBtn" disabled>Start</button>
+    <button id="callBtn" disabled>Call</button>
+    <button id="shareTabBtn" disabled>Share Tab</button>
+    <button id="hangupBtn">Hang Up</button>
+  </div>
+  <div class="file-transfer">
+    <h2>File Transfer</h2>
+    <input type="file" id="fileInput">
+    <button id="sendBtn">Send File</button>
+    <div id="file-progress"></div>
+  </div>
+
+  <hr>
+
+  <div class="chat-container">
+    <h2>Secure E2EE Chat</h2>
+    <div id="secure-status" style="color: red;">Connection not secure</div>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Type your message...">
+    <button id="sendMessageBtn">Send Message</button>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
+</body>
+</html>
