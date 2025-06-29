@@ -300,6 +300,7 @@ function setupChatSendChannel() {
         console.log('聊天发送通道已关闭');
         sendMessageBtn.disabled = true; // 禁用发送消息按钮
     };
+    sendChannel.onmessage = handleReceiveMessage; // 监听接收消息事件
 }
 
 /**
@@ -308,16 +309,16 @@ function setupChatSendChannel() {
  */
 function setupChatReceiveChannel(channel) {
     receiveChannel = channel;
-    sendChannel = channel; // Use the same channel for sending and receiving
+    sendChannel = channel; // 确保callee也能发送消息
     receiveChannel.binaryType = 'arraybuffer'; // 设置为 arraybuffer
     receiveChannel.onmessage = handleReceiveMessage; // 监听接收消息事件
     receiveChannel.onopen = () => {
         console.log('聊天接收通道已打开');
-        sendMessageBtn.disabled = false; // Enable send button for the callee
+        sendMessageBtn.disabled = false; // 为callee启用发送按钮
     };
     receiveChannel.onclose = () => {
         console.log('聊天接收通道已关闭');
-        sendMessageBtn.disabled = true; // Disable send button for the callee
+        sendMessageBtn.disabled = true; // 为callee禁用发送按钮
     };
 }
 
@@ -327,6 +328,12 @@ function setupChatReceiveChannel(channel) {
  */
 async function handleReceiveMessage(event) {
     const decryptedMessage = await decryptMessage(event.data);
+    console.log("接收到的加密消息:", event.data);
+    console.log("解密后的消息:", decryptedMessage);
+    if (decryptedMessage === "DECRYPTION_FAILED") {
+        console.warn("解密失败，可能是非加密消息或数据通道未正确设置。");
+        return; // 如果解密失败，直接返回
+    }
     if (decryptedMessage && decryptedMessage !== "DECRYPTION_FAILED") {
         displayMessage(`对方: ${decryptedMessage}`); // 在界面上显示解密后的消息
     }
@@ -346,6 +353,7 @@ function setupFileSendChannel() {
         console.log('文件发送通道已关闭');
         sendBtn.disabled = true; // 禁用发送文件按钮
     };
+    fileSendChannel.onmessage = handleFileReceiveMessage;
     // 这里可以添加文件发送的进度处理等
 }
 
@@ -355,11 +363,17 @@ function setupFileSendChannel() {
  */
 function setupFileReceiveChannel(channel) {
     fileReceiveChannel = channel;
+    fileSendChannel = channel; // 解决callee无法发送文件的问题
     fileReceiveChannel.binaryType = 'arraybuffer';
     fileReceiveChannel.onmessage = handleFileReceiveMessage;
-    fileReceiveChannel.onopen = () => console.log('文件接收通道已打开');
-    fileReceiveChannel.onclose = () => console.log('文件接收通道已关闭');
-    // 这里可以添加文件接收的进度处理等
+    fileReceiveChannel.onopen = () => {
+        console.log('文件接收通道已打开');
+        sendBtn.disabled = false; // 为callee启用发送文件按钮
+    };
+    fileReceiveChannel.onclose = () => {
+        console.log('文件接收通道已关闭');
+        sendBtn.disabled = true; // 为callee禁用发送文件按钮
+    };
 }
 
 /**
